@@ -1,0 +1,92 @@
+{
+  "name": "dsh-openui",
+  "version": "0.1.0",
+  "description": "OpenUI Lang interactive response renderer for DeepSeek Harness",
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Melonlollipop/dsh-openui.git"
+  },
+  "homepage": "https://github.com/Melonlollipop/dsh-openui#readme",
+  "bugs": {
+    "url": "https://github.com/Melonlollipop/dsh-openui/issues"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "openui",
+    "interactive-ui",
+    "plugin"
+  ],
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "generate": "openui generate src/openui/library.ts --spec --out generated/spec.json && openui generate src/openui/library.ts --out generated/system-prompt.txt --prompt-options promptOptions",
+    "build": "npm run generate && node scripts/build.mjs",
+    "check": "npm run typecheck && npm test && npm run build",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test tests/*.test.mjs tests/*.test.ts"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-chat",
+        "@deepseek-ai/dsh-client-ui-tool"
+      ],
+      "platform": "web"
+    },
+    "manifestVersion": 1
+  },
+  "files": [
+    "lib",
+    "generated",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    "NOTICE.md",
+    "CHANGELOG.md"
+  ],
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.4",
+    "@deepseek-ai/dsh-client-ui-chat": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-conversation": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-slots": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-tool": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-host-webserver": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-system-prompt": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-tools": "^0.2.0-rc.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "dependencies": {
+    "@openuidev/lang-core": "1.0.0",
+    "@openuidev/react-lang": "1.0.0",
+    "katex": "0.19.0",
+    "lucide-react": "0.562.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "4.0.4",
+    "@deepseek-ai/dsh-system-prompt": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-tools": "0.2.0-rc.2",
+    "@openuidev/cli": "0.4.1",
+    "@types/node": "^24.0.0",
+    "@types/react": "~18.3.1",
+    "@types/react-dom": "~18.3.1",
+    "esbuild": "^0.25.12",
+    "typescript": "^5.9.3"
+  }
+}
