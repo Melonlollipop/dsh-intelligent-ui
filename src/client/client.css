@@ -68,6 +68,29 @@
   font-size: 13px;
 }
 
+.dsh-openui-errors {
+  margin: 0 18px 18px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--dsw-alias-state-danger, #d92d20) 35%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--dsw-alias-state-danger, #d92d20) 7%, transparent);
+  color: var(--dsw-alias-label-primary, #171717);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.dsh-openui-errors strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--dsw-alias-state-danger, #b42318);
+  font-size: 13px;
+}
+
+.dsh-openui-errors ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
 .dsh-openui-source {
   border-top: 1px solid var(--dsw-alias-border-l2, rgb(0 0 0 / 8%));
 }

@@ -1,11 +1,14 @@
 import "katex/dist/katex.min.css";
 import "./client.css";
 
+import type { OpenUIError } from "@openuidev/lang-core";
 import { BuiltinActionType, Renderer, type ActionEvent } from "@openuidev/react-lang";
 import { useCallback, useLayoutEffect, useRef, useState, type ComponentType } from "react";
 import { createPortal } from "react-dom";
-import { CopyToClipboard } from "../openui/actions";
+import { runLibraryAction } from "../openui/actions";
+import { webUrl } from "../openui/components/style";
 import { library } from "../openui/library";
+import { loadRendererState, rendererErrorMessages, saveRendererState } from "./renderer-support";
 import { readStreamingString } from "./streaming-json";
 
 type InputActions = {
@@ -55,18 +58,26 @@ function assistantMessage(event: ActionEvent): string {
   return `${event.humanFriendlyMessage}${suffix}`;
 }
 
-function OpenUICard({ args, streaming, inputActions }: {
+function OpenUICard({ args, callId, streaming, inputActions }: {
   args: RenderArgs;
+  callId: string;
   streaming: boolean;
   inputActions: InputActions;
 }) {
+  const [initialState] = useState(() => loadRendererState(window.localStorage, callId));
+  const [rendererErrors, setRendererErrors] = useState<OpenUIError[]>([]);
+  const errorMessages = rendererErrorMessages(rendererErrors);
+
+  const persistState = useCallback((state: Record<string, unknown>) => {
+    if (!streaming) saveRendererState(window.localStorage, callId, state);
+  }, [callId, streaming]);
+
   const onAction = useCallback((event: ActionEvent) => {
-    if (event.type === CopyToClipboard.name) {
-      void navigator.clipboard.writeText(String(event.params.text));
-      return;
-    }
+    const libraryAction = runLibraryAction(event);
+    if (libraryAction !== null) return;
     if (event.type === BuiltinActionType.OpenUrl) {
-      window.open(String(event.params.url), "_blank", "noopener,noreferrer");
+      const url = webUrl(event.params.url);
+      if (url) window.open(url, "_blank", "noopener,noreferrer");
       return;
     }
     if (event.type === BuiltinActionType.ContinueConversation) {
@@ -89,10 +100,19 @@ function OpenUICard({ args, streaming, inputActions }: {
             library={library}
             isStreaming={streaming}
             onAction={onAction}
+            initialState={initialState}
+            onStateUpdate={persistState}
+            onError={setRendererErrors}
           />
         </div>
       ) : (
         <div className="dsh-openui-empty">正在生成交互界面…</div>
+      )}
+      {!streaming && errorMessages.length > 0 && (
+        <aside className="dsh-openui-errors" role="alert">
+          <strong>交互界面未完整渲染</strong>
+          <ul>{errorMessages.map((message, index) => <li key={`${index}-${message}`}>{message}</li>)}</ul>
+        </aside>
       )}
       {!streaming && args.program && (
         <details className="dsh-openui-source">
@@ -139,7 +159,7 @@ function OpenUIToolView(props: OpenUIToolViewProps) {
         {streaming ? "正在生成交互界面…" : "交互界面已显示在正文中"}
       </span>
       {portalRoot && createPortal(
-        <OpenUICard args={args} streaming={streaming} inputActions={props.inputActions} />,
+        <OpenUICard args={args} callId={props.callId} streaming={streaming} inputActions={props.inputActions} />,
         portalRoot,
       )}
     </>

@@ -3,6 +3,16 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { createParser } from "@openuidev/lang-core";
 
+test("the generated spec exposes the full function and action surface", async () => {
+  const spec = JSON.parse(await readFile(new URL("../generated/spec.json", import.meta.url), "utf8"));
+
+  assert.equal(Object.keys(spec.functions ?? {}).length, 59);
+  assert.deepEqual(Object.keys(spec.actions ?? {}), ["CopyToClipboard"]);
+  for (const [name, definition] of Object.entries(spec.functions ?? {})) {
+    assert.match(definition.description, /^[^\n]{8,240}$/, name);
+  }
+});
+
 test("the generated library parses an interactive program", async () => {
   const spec = JSON.parse(await readFile(new URL("../generated/spec.json", import.meta.url), "utf8"));
   const parser = createParser(spec.schema, spec.root);
