@@ -39,10 +39,13 @@ type RenderArgs = { program: string; title?: string };
 
 const wikiCache = new Map<string, WikiInfo>();
 const imageCache = new Map<string, string[]>();
+const routeCache = new Map<string, [number, number][]>();
 const headers = { "User-Agent": "dsh-openui/0.1" };
 const skipImage = /\.svg|icon|logo|map|flag|seal|coat_of_arms|signature|diagram/i;
 
-const promptPath = join(dirname(fileURLToPath(import.meta.url)), "..", "generated", "system-prompt.txt");
+const bundleDir = dirname(fileURLToPath(import.meta.url));
+const promptPath = join(bundleDir, "..", "generated", "system-prompt.txt");
+const mapWorker = readFileSync(join(bundleDir, "maplibre-gl-worker.mjs"), "utf8");
 const generatedPrompt = readFileSync(promptPath, "utf8").replace(
   /^You are an AI assistant that responds using openui-lang, a declarative UI language\. Your ENTIRE response must be valid openui-lang code — no markdown, no explanations, just openui-lang\.$/m,
   "The render_openui program must be valid openui-lang code: no markdown or explanations inside the program string.",
@@ -142,6 +145,25 @@ async function searchImages(search: string): Promise<string[]> {
   return result;
 }
 
+async function streetRoute(coords: string): Promise<[number, number][]> {
+  const cached = routeCache.get(coords);
+  if (cached) return cached;
+  const response = await fetch(`https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson&steps=false`, {
+    headers,
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!response.ok) throw new Error(`OSRM ${response.status}`);
+  const data = await response.json() as {
+    code?: string;
+    routes?: { geometry?: { coordinates?: [number, number][] } }[];
+  };
+  const coordinates = data.routes?.[0]?.geometry?.coordinates ?? [];
+  if (data.code !== "Ok" || coordinates.length < 2) throw new Error("No street route");
+  const route = coordinates.map(([lng, lat]) => [lat, lng] as [number, number]);
+  routeCache.set(coords, route);
+  return route;
+}
+
 function registerRoutes(ctx: Context) {
   ctx.effect(() => ctx.webServer.register({
     kind: "exact",
@@ -155,6 +177,17 @@ function registerRoutes(ctx: Context) {
       });
     },
   }), "dsh-openui: status route");
+
+  ctx.effect(() => ctx.webServer.register({
+    kind: "exact",
+    path: "/openui/maplibre-gl-worker.mjs",
+    async handler(_req, res) {
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "text/javascript; charset=utf-8");
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      res.end(mapWorker);
+    },
+  }), "dsh-openui: MapLibre worker");
 
   ctx.effect(() => ctx.webServer.register({
     kind: "exact",
@@ -173,6 +206,15 @@ function registerRoutes(ctx: Context) {
       json(res, { images: await searchImages(search) });
     },
   }), "dsh-openui: image search route");
+
+  ctx.effect(() => ctx.webServer.register({
+    kind: "exact",
+    path: "/openui/api/street-route",
+    async handler(req, res) {
+      const coords = new URL(req.url!, "http://localhost").searchParams.get("coords")!;
+      json(res, { points: await streetRoute(coords) });
+    },
+  }), "dsh-openui: street route");
 }
 
 export function apply(ctx: Context) {

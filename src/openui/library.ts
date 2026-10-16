@@ -3,6 +3,7 @@ import { actions } from "./actions";
 import { functions } from "./functions";
 import "./components/theme.css";
 import "./components/components.css";
+import "./components/map/map.css";
 import { Chart } from "./components/chart";
 import { Carousel, Celebration, Code, Flashcard, MathBlock, Popover, Quote, YouTube } from "./components/extra";
 import {
@@ -21,6 +22,7 @@ import {
 } from "./components/controls";
 import { HtmlView } from "./components/html-view";
 import { Box, Card, Col, Divider, Form, Grid, Row, Spacer } from "./components/layout";
+import { MapMarker, MapView } from "./components/map/map";
 import { Icon, Image, SearchImage } from "./components/media";
 import { svgComponents } from "./components/svg";
 import { Table } from "./components/table";
@@ -38,7 +40,7 @@ export const library = createLibrary({
     Col, Row, Box, Grid, Card, Carousel, Popover, Divider, Spacer,
     Title, Text, Caption, Label, Badge, Link, List, ListItem, Markdown, Quote, Code, MathBlock,
     Button, IconButton, Pressable, Input, TextArea, Select, SegmentedControl, Slider, Checkbox, RadioGroup, DatePicker, Timer, Form,
-    SearchImage, Image, Icon, Table, Chart, YouTube,
+    SearchImage, Image, Icon, Table, Chart, MapView, MapMarker, YouTube,
     Flashcard, Celebration,
     ...svgComponents, HtmlView,
   ],
@@ -62,7 +64,7 @@ export const library = createLibrary({
         '- Every input either changes something shown on the page, or sits in a Form whose submit Button sends a short first-person @ToAssistant ("Help me choose a bike"); the form values go with it. No dead inputs.',
       ],
     },
-    { name: "Media and data", components: ["SearchImage", "Image", "Icon", "Table", "Chart", "YouTube"] },
+    { name: "Media and data", components: ["SearchImage", "Image", "Icon", "Table", "Chart", "Map", "MapMarker", "YouTube"] },
     { name: "Play", components: ["Flashcard", "Celebration"] },
     { name: "Drawing", components: ["Svg", "G", "Circle", "Ellipse", "Rect", "Line", "Path", "Polyline", "Polygon", "SvgText", "HtmlView"] },
   ],

@@ -76,6 +76,8 @@ Image(src: string, alt: string, aspectRatio?: number, radius?: Radius, fit?: "co
 Icon(name: string, size?: "sm" | "md" | "lg" | "xl", color?: Color) — Lucide icon by name, e.g. "map-pin".
 Table(columns: string[], rows: any[][]) — Each row lists its cells in column order; a cell may be a component. Number columns align right.
 Chart(type: "bar" | "line" | "area" | "pie" | "donut" | "scatter", data: Record<string, string | number>[], x?: string, series?: string[], format?: "number" | "currency" | "percent", currency?: string, stacked?: boolean, height?: number) — Rows of data; x is the category key (a number key for scatter), series the value keys (default: every number key). percent values are like 45; currency is a code like "EUR".
+Map(markers: MapMarker[], route?: boolean, selected?: $binding<string>, height?: number) — Street map fitted to its markers. route draws the road path in marker order; selected holds the clicked marker's label.
+MapMarker(label: string, lat: number, lng: number, category?: string, icon?: string) — A place on a Map; icon is one emoji, else the pin shows its number.
 YouTube(video: string, title?: string) — Embedded YouTube video by id or URL. Only a video you know exists.
 
 ### Play
@@ -275,7 +277,8 @@ Before finishing, walk your output and verify:
 - cond ? a : b also picks between components; there is no @If. Use only the listed @functions; you cannot define your own.
 - Derive rows once in a statement with @Each(list, "x", {...}), then reuse them in @Each, Table, Chart, @Sum(rows.field) and @Join. @Each(@Range(0, n), "i", ...) builds a series or repeats a step.
 - @Random, @Pick and @Shuffle give a new value on every evaluation: call them inside @Set, so a click draws once and the page stays still.
-- Pick the medium that shows the idea: Chart for numbers across time or categories; Svg drawings for shapes, parts and movement; Table for comparisons; Flashcard and Celebration for learning and games; HtmlView only for a game or animation that needs a loop.
+- Pick the medium that shows the idea: Chart for numbers across time or categories; Svg drawings for shapes, parts and movement; Map with MapMarker for places and routes; Table for comparisons; Flashcard and Celebration for learning and games; HtmlView only for a game or animation that needs a loop.
+- For a route, itinerary or answer centered on two or more real places, include an interactive Map with one MapMarker per place. Use accurate latitude and longitude, set route to true when visit order matters, give related markers the same category, and use one emoji icon per place when useful.
 - Draw with Svg whenever the user would otherwise have to picture it: assembly and how-to steps (a simple drawing for each step, like an instruction leaflet), knots and folds, how a machine, mechanism or the body works, geometry and science diagrams, the layout of a room, garden or board, chord and clock faces. A photo shows what a thing looks like; a drawing shows how it goes together or works, so a how-to or how-it-works answer has drawings even when it also has a photo. Keep each drawing simple: a viewBox about 240 wide, a dozen or so shapes in the listed colors with SvgText labels, a Line with a small Polygon head for an arrow, and let $variables such as the current step drive it.
 - Format money, percentages and big numbers with @Format, counts with @Plural and dates with @FormatDate.
 - Dates relative to now (today, this week, next month) start from @Today(), never a fixed date. <, >, <= and >= compare numbers only, so order two dates with @DaysBetween(a, b) > 0.

@@ -6,6 +6,7 @@ import { apply } from "../lib/index.js";
 test("render_openui concludes the turn after returning the interface", async () => {
   let tool;
   let section;
+  const routes = [];
   const ctx = {
     tools: {
       register(value) {
@@ -23,7 +24,8 @@ test("render_openui concludes the turn after returning the interface", async () 
       },
     },
     webServer: {
-      register() {
+      register(route) {
+        routes.push(route.path);
         return () => {};
       },
     },
@@ -53,4 +55,6 @@ test("render_openui concludes the turn after returning the interface", async () 
   assert.deepEqual(result, args);
   assert.match(tool.description, /end the turn/);
   assert.match(section.text({ scope: {} }), /ends the current turn/);
+  assert.ok(routes.includes("/openui/maplibre-gl-worker.mjs"));
+  assert.ok(routes.includes("/openui/api/street-route"));
 });

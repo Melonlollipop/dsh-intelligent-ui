@@ -1,4 +1,4 @@
-import { readFile, rm } from "node:fs/promises";
+import { copyFile, mkdir, readFile, rm } from "node:fs/promises";
 import { basename, resolve } from "node:path";
 import { build } from "esbuild";
 
@@ -29,6 +29,11 @@ if (document.querySelector('style[data-plugin-css=' + JSON.stringify(id) + ']') 
 };
 
 await rm(outdir, { recursive: true, force: true });
+await mkdir(outdir, { recursive: true });
+await copyFile(
+  resolve(root, "node_modules/maplibre-gl/dist/maplibre-gl-worker.mjs"),
+  resolve(outdir, "maplibre-gl-worker.mjs"),
+);
 
 await build({
   entryPoints: [resolve(root, "src/host/index.ts")],

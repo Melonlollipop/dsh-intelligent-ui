@@ -19,7 +19,7 @@ The upstream-derived material is not covered by the MIT grant for this repositor
 - Added a DSH host tool and streaming client renderer.
 - Rendered completed interfaces directly in the DSH answer column.
 - Added DSH theme integration and responsive layout corrections.
-- Removed the map component that required a separate frontend Worker.
+- Added the upstream `Map` and `MapMarker` components, MapLibre GL basemap, expandable controls, marker filtering and OSRM route overlay to the DSH renderer.
 - Added turn-conclusion behavior, tests, build tooling and publication documentation.
 
 ## No endorsement
