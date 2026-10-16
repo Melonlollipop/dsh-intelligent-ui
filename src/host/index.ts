@@ -1,16 +1,18 @@
 import { readFileSync } from "node:fs";
+import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineTool } from "@deepseek-ai/dsh-tools";
+import { ImageDiskCache } from "./image-cache";
 
 export const name = "dsh-openui";
 export const inject = ["tools", "systemPrompt", "webServer", "clientModules"];
 
-type HttpRequest = { url?: string };
+type HttpRequest = { method?: string; url?: string };
 type HttpResponse = {
   statusCode: number;
   setHeader(name: string, value: string): void;
-  end(body?: string): void;
+  end(body?: string | Buffer): void;
 };
 
 type Context = {
@@ -22,13 +24,15 @@ type Context = {
     section(section: { name: string; order: number; interpolate?: boolean; text: string | ((context: { scope: unknown }) => string) }): () => void;
   };
   webServer: {
-    register(route: { kind: "exact"; path: string; handler(req: HttpRequest, res: HttpResponse): Promise<void> }): () => void;
+    register(route: { kind: "exact" | "prefix"; path: string; handler(req: HttpRequest, res: HttpResponse): Promise<void> }): () => void;
   };
   clientModules: {
     graph(): { entries: { id: string; rev: string }[] };
     clientPath(id: string): string | undefined;
   };
   effect(effect: () => () => void, label?: string): void;
+  on(event: "api-session/removed", listener: (sessionId: string) => void | Promise<void>): () => void;
+  logger: { warn(message: string): void };
 };
 
 type WikiSummary = { thumbnail?: { source?: string }; coordinates?: { lat?: number; lon?: number } };
@@ -38,12 +42,12 @@ type Page = { index?: number; title?: string; thumbnail?: { source?: string }; i
 type RenderArgs = { program: string; title?: string };
 
 const wikiCache = new Map<string, WikiInfo>();
-const imageCache = new Map<string, string[]>();
 const routeCache = new Map<string, [number, number][]>();
 const headers = { "User-Agent": "dsh-openui/0.1" };
 const skipImage = /\.svg|icon|logo|map|flag|seal|coat_of_arms|signature|diagram/i;
 
 const bundleDir = dirname(fileURLToPath(import.meta.url));
+const imageCacheRoot = () => process.env.DSH_OPENUI_CACHE_DIR ?? join(homedir(), ".dsh", "dsh-openui", "image-cache");
 const promptPath = join(bundleDir, "..", "generated", "system-prompt.txt");
 const mapWorker = readFileSync(join(bundleDir, "maplibre-gl-worker.mjs"), "utf8");
 const generatedPrompt = readFileSync(promptPath, "utf8").replace(
@@ -60,7 +64,7 @@ ${generatedPrompt}`;
 function json(res: HttpResponse, value: unknown, status = 200) {
   res.statusCode = status;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
-  res.setHeader("Cache-Control", "public, max-age=3600");
+  res.setHeader("Cache-Control", status >= 400 ? "no-store" : "public, max-age=3600");
   res.end(JSON.stringify(value));
 }
 
@@ -106,9 +110,7 @@ async function query(host: string, params: Record<string, string>): Promise<Page
 
 const words = (text: string) => text.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter((word) => word.length > 3);
 
-async function searchImages(search: string): Promise<string[]> {
-  const cached = imageCache.get(search);
-  if (cached) return cached;
+async function findRemoteImages(search: string): Promise<string[]> {
   const images: string[] = [];
   const add = (url: string | undefined) => {
     if (url?.startsWith("https://") && !skipImage.test(url) && !images.includes(url)) images.push(url);
@@ -140,9 +142,7 @@ async function searchImages(search: string): Promise<string[]> {
       if (info?.mime?.startsWith("image/")) add(info.thumburl ?? info.url);
     });
   }
-  const result = images.slice(0, 4);
-  imageCache.set(search, result);
-  return result;
+  return images.slice(0, 4);
 }
 
 async function streetRoute(coords: string): Promise<[number, number][]> {
@@ -164,7 +164,7 @@ async function streetRoute(coords: string): Promise<[number, number][]> {
   return route;
 }
 
-function registerRoutes(ctx: Context) {
+function registerRoutes(ctx: Context, imageCache: ImageDiskCache) {
   ctx.effect(() => ctx.webServer.register({
     kind: "exact",
     path: "/openui/status",
@@ -174,6 +174,7 @@ function registerRoutes(ctx: Context) {
         plugin: name,
         clientModule: entry,
         clientPath: ctx.clientModules.clientPath("dsh-openui"),
+        imageCache: await imageCache.status(),
       });
     },
   }), "dsh-openui: status route");
@@ -194,7 +195,8 @@ function registerRoutes(ctx: Context) {
     path: "/openui/api/wiki",
     async handler(req, res) {
       const title = new URL(req.url!, "http://localhost").searchParams.get("title")!.trim();
-      json(res, await wiki(title));
+      const info = await wiki(title);
+      json(res, { ...info, photos: await imageCache.rememberSearch(`wiki:${title}`, info.photos) });
     },
   }), "dsh-openui: wiki image route");
 
@@ -203,9 +205,80 @@ function registerRoutes(ctx: Context) {
     path: "/openui/api/image-search",
     async handler(req, res) {
       const search = new URL(req.url!, "http://localhost").searchParams.get("q")!.replace(/\s+/g, " ").trim();
-      json(res, { images: await searchImages(search) });
+      const cached = await imageCache.cachedSearch(search);
+      if (cached) {
+        json(res, { images: cached });
+        return;
+      }
+      const [exact, found] = await Promise.all([
+        wiki(search).catch((): WikiInfo => ({ photos: [] })),
+        findRemoteImages(search).catch(() => []),
+      ]);
+      const urls = [...new Set([...exact.photos, ...found])].slice(0, 4);
+      json(res, { images: await imageCache.rememberSearch(search, urls) });
     },
   }), "dsh-openui: image search route");
+
+  ctx.effect(() => ctx.webServer.register({
+    kind: "exact",
+    path: "/openui/api/image-source",
+    async handler(req, res) {
+      const source = new URL(req.url!, "http://localhost").searchParams.get("url")!;
+      json(res, { image: await imageCache.registerSource(source) });
+    },
+  }), "dsh-openui: image source route");
+
+  ctx.effect(() => ctx.webServer.register({
+    kind: "prefix",
+    path: "/openui/api/image",
+    async handler(req, res) {
+      const requestUrl = new URL(req.url!, "http://localhost");
+      const id = requestUrl.pathname.slice("/openui/api/image/".length);
+      if (!/^[a-f0-9]{64}$/.test(id)) {
+        json(res, { error: "unknown image" }, 404);
+        return;
+      }
+      try {
+        const sessionId = requestUrl.searchParams.get("sessionId") ?? "";
+        const callId = requestUrl.searchParams.get("callId") ?? "";
+        const image = await imageCache.image(id, sessionId && callId ? { sessionId, callId } : undefined);
+        if (!image) {
+          json(res, { error: "unknown image" }, 404);
+          return;
+        }
+        res.statusCode = 200;
+        res.setHeader("Content-Type", image.contentType);
+        res.setHeader("Content-Length", String(image.body.byteLength));
+        res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+        res.setHeader("ETag", `\"${image.etag}\"`);
+        res.end(image.body);
+      } catch (error) {
+        res.setHeader("Retry-After", "5");
+        json(res, { error: error instanceof Error ? error.message : String(error) }, 503);
+      }
+    },
+  }), "dsh-openui: cached image route");
+
+  ctx.effect(() => ctx.webServer.register({
+    kind: "exact",
+    path: "/openui/api/image-cache/status",
+    async handler(_req, res) {
+      json(res, await imageCache.status());
+    },
+  }), "dsh-openui: image cache status route");
+
+  ctx.effect(() => ctx.webServer.register({
+    kind: "exact",
+    path: "/openui/api/image-cache/clear",
+    async handler(req, res) {
+      if (req.method !== "POST") {
+        json(res, { error: "POST required" }, 405);
+        return;
+      }
+      await imageCache.clear();
+      json(res, await imageCache.status());
+    },
+  }), "dsh-openui: image cache clear route");
 
   ctx.effect(() => ctx.webServer.register({
     kind: "exact",
@@ -218,7 +291,10 @@ function registerRoutes(ctx: Context) {
 }
 
 export function apply(ctx: Context) {
-  registerRoutes(ctx);
+  const imageCache = new ImageDiskCache(imageCacheRoot());
+  void imageCache.init().catch((error) => ctx.logger.warn(`dsh-openui: image cache initialization failed: ${String(error)}`));
+  registerRoutes(ctx, imageCache);
+  ctx.effect(() => ctx.on("api-session/removed", (sessionId) => imageCache.releaseSession(sessionId)), "dsh-openui: release deleted session images");
   ctx.systemPrompt.section({
     name: "tool:render-openui",
     order: 6500,

@@ -55,10 +55,16 @@ test("allows only absolute HTTP(S) links", () => {
 
 test("the DSH renderer wires persistence and upstream action handling", async () => {
   const source = await readFile(new URL("../src/client/index.tsx", import.meta.url), "utf8");
+  const media = await readFile(new URL("../src/openui/components/media.tsx", import.meta.url), "utf8");
 
   assert.match(source, /initialState=\{initialState\}/);
   assert.match(source, /onStateUpdate=\{persistState\}/);
   assert.match(source, /onError=\{setRendererErrors\}/);
   assert.match(source, /runLibraryAction\(event\)/);
   assert.match(source, /webUrl\(event\.params\.url\)/);
+  assert.match(source, /ImageOwnerProvider sessionId=\{props\.sessionId\} callId=\{props\.callId\}/);
+  assert.match(source, /inject: \(sessionId\) => \(\{ sessionId \}\)/);
+  assert.match(media, /IMAGE_RETRY_DELAYS/);
+  assert.match(media, /window\.addEventListener\("online", retry\)/);
+  assert.match(media, /sessionId/);
 });

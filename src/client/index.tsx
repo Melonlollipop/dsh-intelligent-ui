@@ -6,6 +6,7 @@ import { BuiltinActionType, Renderer, type ActionEvent } from "@openuidev/react-
 import { useCallback, useLayoutEffect, useRef, useState, type ComponentType } from "react";
 import { createPortal } from "react-dom";
 import { runLibraryAction } from "../openui/actions";
+import { ImageOwnerProvider } from "../openui/components/media";
 import { webUrl } from "../openui/components/style";
 import { library } from "../openui/library";
 import { loadRendererState, rendererErrorMessages, saveRendererState } from "./renderer-support";
@@ -25,6 +26,7 @@ type OpenUIToolViewProps = {
   block: StartedBlock | ResultBlock;
   useToolCallArgumentsPartial(): string;
   inputActions: InputActions;
+  sessionId: string;
 };
 
 type RenderArgs = {
@@ -159,7 +161,9 @@ function OpenUIToolView(props: OpenUIToolViewProps) {
         {streaming ? "正在生成交互界面…" : "交互界面已显示在正文中"}
       </span>
       {portalRoot && createPortal(
-        <OpenUICard args={args} callId={props.callId} streaming={streaming} inputActions={props.inputActions} />,
+        <ImageOwnerProvider sessionId={props.sessionId} callId={props.callId}>
+          <OpenUICard args={args} callId={props.callId} streaming={streaming} inputActions={props.inputActions} />
+        </ImageOwnerProvider>,
         portalRoot,
       )}
     </>
@@ -174,11 +178,13 @@ export function apply(ctx: {
     register(options: {
       name: string;
       key?: string;
+      inject?: (sessionId: string) => { sessionId: string };
     }, component: ComponentType<any>): () => void;
   };
 }) {
   ctx.slots.inject("tool.call.toolview", () => ctx.slots.register({
     name: "tool.call.toolview",
     key: "render_openui",
+    inject: (sessionId) => ({ sessionId }),
   }, OpenUIToolView));
 }
