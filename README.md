@@ -1,4 +1,4 @@
-# dsh-openui
+# dsh-intelligent-ui
 
 让 DeepSeek Harness 按需把回答渲染成可交互界面的 OpenUI Lang 插件。
 
@@ -48,7 +48,7 @@ OpenUI 只在模型判断交互界面确实有帮助时使用。工具调用记�
 4. 执行：
 
 ```powershell
-dsh plugin --profile desktop add "github:Melonlollipop/dsh-openui#v0.1.0"
+dsh plugin --profile desktop add "github:Melonlollipop/dsh-intelligent-ui#v0.1.0"
 ```
 
 5. 重新启动 DSH 桌面版。
@@ -56,7 +56,7 @@ dsh plugin --profile desktop add "github:Melonlollipop/dsh-openui#v0.1.0"
 ### 独立 Web 版
 
 ```powershell
-npx -y @deepseek-ai/dsh plugin --profile web add "github:Melonlollipop/dsh-openui#v0.1.0"
+npx -y @deepseek-ai/dsh plugin --profile web add "github:Melonlollipop/dsh-intelligent-ui#v0.1.0"
 ```
 
 安装后重启 `dsh web`。
@@ -66,13 +66,13 @@ npx -y @deepseek-ai/dsh plugin --profile web add "github:Melonlollipop/dsh-openu
 发布新标签后，使用对应的新标签重新安装。例如：
 
 ```powershell
-dsh plugin --profile desktop add "github:Melonlollipop/dsh-openui#v0.2.0"
+dsh plugin --profile desktop add "github:Melonlollipop/dsh-intelligent-ui#v0.2.0"
 ```
 
 ### 卸载
 
 ```powershell
-dsh plugin --profile desktop remove dsh-openui
+dsh plugin --profile desktop remove dsh-intelligent-ui
 ```
 
 卸载后完整重启 DSH。
@@ -91,8 +91,8 @@ dsh plugin --profile desktop remove dsh-openui
 ## 本地开发
 
 ```powershell
-git clone https://github.com/Melonlollipop/dsh-openui.git
-Set-Location dsh-openui
+git clone https://github.com/Melonlollipop/dsh-intelligent-ui.git
+Set-Location dsh-intelligent-ui
 npm ci
 npm run typecheck
 npm test
@@ -102,7 +102,7 @@ npm run build
 将本地目录安装到桌面 Profile：
 
 ```powershell
-dsh plugin --profile desktop add "file:D:/absolute/path/to/dsh-openui"
+dsh plugin --profile desktop add "file:D:/absolute/path/to/dsh-intelligent-ui"
 ```
 
 构建输出位于 `lib/`；OpenUI 规范和系统提示词位于 `generated/`。这两个目录需要提交到仓库，因为 GitHub 安装直接使用已构建产物。
@@ -112,7 +112,7 @@ dsh plugin --profile desktop add "file:D:/absolute/path/to/dsh-openui"
 图片缓存位于：
 
 ```text
-%USERPROFILE%\.dsh\dsh-openui\image-cache
+%USERPROFILE%\.dsh\dsh-intelligent-ui\image-cache
 ```
 
 缓存目录不在插件安装位置内，因此升级或重新安装插件不会导致已缓存图片丢失。同一张图片被多个会话使用时只保存一份；只有最后一个会话引用被删除后，图片文件才会随会话永久删除。

@@ -3,7 +3,7 @@ import type { OpenUIError } from "@openuidev/lang-core";
 type RendererState = Record<string, unknown>;
 type StateStorage = Pick<Storage, "getItem" | "setItem">;
 
-const STATE_PREFIX = "dsh-openui:renderer-state:v1:";
+const STATE_PREFIX = "dsh-intelligent-ui:renderer-state:v1:";
 
 export function rendererStateKey(callId: string) {
   return `${STATE_PREFIX}${callId}`;

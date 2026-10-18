@@ -10,11 +10,11 @@
 {
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Melonlollipop/dsh-openui.git"
+    "url": "git+https://github.com/Melonlollipop/dsh-intelligent-ui.git"
   },
-  "homepage": "https://github.com/Melonlollipop/dsh-openui#readme",
+  "homepage": "https://github.com/Melonlollipop/dsh-intelligent-ui#readme",
   "bugs": {
-    "url": "https://github.com/Melonlollipop/dsh-openui/issues"
+    "url": "https://github.com/Melonlollipop/dsh-intelligent-ui/issues"
   }
 }
 ```
@@ -47,7 +47,7 @@ git init -b main
 git add .
 git status
 git commit -m "Initial release"
-git remote add origin https://github.com/Melonlollipop/dsh-openui.git
+git remote add origin https://github.com/Melonlollipop/dsh-intelligent-ui.git
 git push -u origin main
 ```
 
@@ -63,7 +63,7 @@ GitHub 上的空仓库不要预先创建 README、`.gitignore` 或 LICENSE，以
 ## 6. 创建首个 Release
 
 ```bash
-git tag -a v0.1.0 -m "dsh-openui v0.1.0"
+git tag -a v0.1.0 -m "dsh-intelligent-ui v0.1.0"
 git push origin v0.1.0
 ```
 

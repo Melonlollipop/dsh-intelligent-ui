@@ -89,14 +89,14 @@ function OpenUICard({ args, callId, streaming, inputActions }: {
   }, [inputActions]);
 
   return (
-    <section className="dsh-openui-card" aria-label={args.title || "Interactive UI"}>
-      <header className="dsh-openui-head">
-        {streaming && <span className="dsh-openui-live" aria-hidden />}
+    <section className="dsh-intelligent-ui-card" aria-label={args.title || "Interactive UI"}>
+      <header className="dsh-intelligent-ui-head">
+        {streaming && <span className="dsh-intelligent-ui-live" aria-hidden />}
         <strong>{args.title || "Interactive UI"}</strong>
         {streaming && <span>生成中</span>}
       </header>
       {args.program ? (
-        <div className="dsh-openui-body">
+        <div className="dsh-intelligent-ui-body">
           <Renderer
             response={args.program}
             library={library}
@@ -108,16 +108,16 @@ function OpenUICard({ args, callId, streaming, inputActions }: {
           />
         </div>
       ) : (
-        <div className="dsh-openui-empty">正在生成交互界面…</div>
+        <div className="dsh-intelligent-ui-empty">正在生成交互界面…</div>
       )}
       {!streaming && errorMessages.length > 0 && (
-        <aside className="dsh-openui-errors" role="alert">
+        <aside className="dsh-intelligent-ui-errors" role="alert">
           <strong>交互界面未完整渲染</strong>
           <ul>{errorMessages.map((message, index) => <li key={`${index}-${message}`}>{message}</li>)}</ul>
         </aside>
       )}
       {!streaming && args.program && (
-        <details className="dsh-openui-source">
+        <details className="dsh-intelligent-ui-source">
           <summary>OpenUI Lang 源码</summary>
           <pre>{args.program}</pre>
         </details>
@@ -130,11 +130,11 @@ function mountPoint(marker: HTMLElement, callId: string) {
   const anchor = marker.closest<HTMLElement>("[data-chat-group-key]")
     ?? marker.closest<HTMLElement>("[data-chat-flow-key]")!;
   const root = document.createElement("div");
-  root.className = "dsh-openui-portal";
+  root.className = "dsh-intelligent-ui-portal";
   root.dataset.openuiCallId = callId;
   root.dataset.chatGroupPart = "response";
   let previous = anchor;
-  while (previous.nextElementSibling?.classList.contains("dsh-openui-portal")) {
+  while (previous.nextElementSibling?.classList.contains("dsh-intelligent-ui-portal")) {
     previous = previous.nextElementSibling as HTMLElement;
   }
   previous.insertAdjacentElement("afterend", root);
@@ -157,7 +157,7 @@ function OpenUIToolView(props: OpenUIToolViewProps) {
 
   return (
     <>
-      <span ref={marker} className="dsh-openui-tool-status">
+      <span ref={marker} className="dsh-intelligent-ui-tool-status">
         {streaming ? "正在生成交互界面…" : "交互界面已显示在正文中"}
       </span>
       {portalRoot && createPortal(

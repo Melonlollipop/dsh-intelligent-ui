@@ -1,4 +1,4 @@
-.dsh-openui-card {
+.dsh-intelligent-ui-card {
   --openui-font-body: var(--dsw-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
   --openui-foreground: var(--dsw-alias-bg-base, #fff);
   --openui-text-neutral-primary: var(--dsw-alias-label-primary, #171717);
@@ -12,27 +12,27 @@
   overflow: hidden;
 }
 
-.dsh-openui-card,
-.dsh-openui-card *,
-.dsh-openui-card *::before,
-.dsh-openui-card *::after {
+.dsh-intelligent-ui-card,
+.dsh-intelligent-ui-card *,
+.dsh-intelligent-ui-card *::before,
+.dsh-intelligent-ui-card *::after {
   box-sizing: border-box;
 }
 
-.dsh-openui-portal {
+.dsh-intelligent-ui-portal {
   --dsh-chat-flow-gap: 12px;
   width: 100%;
   max-width: 100%;
   min-width: 0;
 }
 
-.dsh-openui-tool-status {
+.dsh-intelligent-ui-tool-status {
   color: var(--dsw-alias-label-caption, #888);
   font-size: var(--dsh-content-font-size-secondary, 13px);
   line-height: 20px;
 }
 
-.dsh-openui-head {
+.dsh-intelligent-ui-head {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -43,32 +43,32 @@
   font-size: 12px;
 }
 
-.dsh-openui-head strong {
+.dsh-intelligent-ui-head strong {
   color: var(--dsw-alias-label-primary, #171717);
   font-size: 13px;
   font-weight: 560;
 }
 
-.dsh-openui-live {
+.dsh-intelligent-ui-live {
   width: 7px;
   height: 7px;
   border-radius: 50%;
   background: var(--dsw-alias-state-business-primary, #5f8ff7);
-  animation: dsh-openui-pulse 1s ease-in-out infinite alternate;
+  animation: dsh-intelligent-ui-pulse 1s ease-in-out infinite alternate;
 }
 
-.dsh-openui-body {
+.dsh-intelligent-ui-body {
   padding: 18px;
   overflow-x: auto;
 }
 
-.dsh-openui-empty {
+.dsh-intelligent-ui-empty {
   padding: 22px 18px;
   color: var(--dsw-alias-label-caption, #888);
   font-size: 13px;
 }
 
-.dsh-openui-errors {
+.dsh-intelligent-ui-errors {
   margin: 0 18px 18px;
   padding: 12px 14px;
   border: 1px solid color-mix(in srgb, var(--dsw-alias-state-danger, #d92d20) 35%, transparent);
@@ -79,30 +79,30 @@
   line-height: 1.55;
 }
 
-.dsh-openui-errors strong {
+.dsh-intelligent-ui-errors strong {
   display: block;
   margin-bottom: 4px;
   color: var(--dsw-alias-state-danger, #b42318);
   font-size: 13px;
 }
 
-.dsh-openui-errors ul {
+.dsh-intelligent-ui-errors ul {
   margin: 0;
   padding-left: 18px;
 }
 
-.dsh-openui-source {
+.dsh-intelligent-ui-source {
   border-top: 1px solid var(--dsw-alias-border-l2, rgb(0 0 0 / 8%));
 }
 
-.dsh-openui-source summary {
+.dsh-intelligent-ui-source summary {
   cursor: pointer;
   padding: 9px 14px;
   color: var(--dsw-alias-label-caption, #888);
   font-size: 12px;
 }
 
-.dsh-openui-source pre {
+.dsh-intelligent-ui-source pre {
   max-height: 320px;
   margin: 0;
   padding: 0 14px 14px;
@@ -112,7 +112,7 @@
   font: 12px/1.55 var(--ds-font-family-code, ui-monospace, monospace);
 }
 
-@keyframes dsh-openui-pulse {
+@keyframes dsh-intelligent-ui-pulse {
   from { opacity: .35; }
   to { opacity: 1; }
 }

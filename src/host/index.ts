@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { defineTool } from "@deepseek-ai/dsh-tools";
 import { ImageDiskCache } from "./image-cache";
 
-export const name = "dsh-openui";
+export const name = "dsh-intelligent-ui";
 export const inject = ["tools", "systemPrompt", "webServer", "clientModules"];
 
 type HttpRequest = { method?: string; url?: string };
@@ -43,11 +43,11 @@ type RenderArgs = { program: string; title?: string };
 
 const wikiCache = new Map<string, WikiInfo>();
 const routeCache = new Map<string, [number, number][]>();
-const headers = { "User-Agent": "dsh-openui/0.1" };
+const headers = { "User-Agent": "dsh-intelligent-ui/0.1" };
 const skipImage = /\.svg|icon|logo|map|flag|seal|coat_of_arms|signature|diagram/i;
 
 const bundleDir = dirname(fileURLToPath(import.meta.url));
-const imageCacheRoot = () => process.env.DSH_OPENUI_CACHE_DIR ?? join(homedir(), ".dsh", "dsh-openui", "image-cache");
+const imageCacheRoot = () => process.env.DSH_INTELLIGENT_UI_CACHE_DIR ?? join(homedir(), ".dsh", "dsh-intelligent-ui", "image-cache");
 const promptPath = join(bundleDir, "..", "generated", "system-prompt.txt");
 const mapWorker = readFileSync(join(bundleDir, "maplibre-gl-worker.mjs"), "utf8");
 const generatedPrompt = readFileSync(promptPath, "utf8").replace(
@@ -169,15 +169,15 @@ function registerRoutes(ctx: Context, imageCache: ImageDiskCache) {
     kind: "exact",
     path: "/openui/status",
     async handler(_req, res) {
-      const entry = ctx.clientModules.graph().entries.find((item) => item.id === "dsh-openui")!;
+      const entry = ctx.clientModules.graph().entries.find((item) => item.id === "dsh-intelligent-ui")!;
       json(res, {
         plugin: name,
         clientModule: entry,
-        clientPath: ctx.clientModules.clientPath("dsh-openui"),
+        clientPath: ctx.clientModules.clientPath("dsh-intelligent-ui"),
         imageCache: await imageCache.status(),
       });
     },
-  }), "dsh-openui: status route");
+  }), "dsh-intelligent-ui: status route");
 
   ctx.effect(() => ctx.webServer.register({
     kind: "exact",
@@ -188,7 +188,7 @@ function registerRoutes(ctx: Context, imageCache: ImageDiskCache) {
       res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
       res.end(mapWorker);
     },
-  }), "dsh-openui: MapLibre worker");
+  }), "dsh-intelligent-ui: MapLibre worker");
 
   ctx.effect(() => ctx.webServer.register({
     kind: "exact",
@@ -198,7 +198,7 @@ function registerRoutes(ctx: Context, imageCache: ImageDiskCache) {
       const info = await wiki(title);
       json(res, { ...info, photos: await imageCache.rememberSearch(`wiki:${title}`, info.photos) });
     },
-  }), "dsh-openui: wiki image route");
+  }), "dsh-intelligent-ui: wiki image route");
 
   ctx.effect(() => ctx.webServer.register({
     kind: "exact",
@@ -217,7 +217,7 @@ function registerRoutes(ctx: Context, imageCache: ImageDiskCache) {
       const urls = [...new Set([...exact.photos, ...found])].slice(0, 4);
       json(res, { images: await imageCache.rememberSearch(search, urls) });
     },
-  }), "dsh-openui: image search route");
+  }), "dsh-intelligent-ui: image search route");
 
   ctx.effect(() => ctx.webServer.register({
     kind: "exact",
@@ -226,7 +226,7 @@ function registerRoutes(ctx: Context, imageCache: ImageDiskCache) {
       const source = new URL(req.url!, "http://localhost").searchParams.get("url")!;
       json(res, { image: await imageCache.registerSource(source) });
     },
-  }), "dsh-openui: image source route");
+  }), "dsh-intelligent-ui: image source route");
 
   ctx.effect(() => ctx.webServer.register({
     kind: "prefix",
@@ -257,7 +257,7 @@ function registerRoutes(ctx: Context, imageCache: ImageDiskCache) {
         json(res, { error: error instanceof Error ? error.message : String(error) }, 503);
       }
     },
-  }), "dsh-openui: cached image route");
+  }), "dsh-intelligent-ui: cached image route");
 
   ctx.effect(() => ctx.webServer.register({
     kind: "exact",
@@ -265,7 +265,7 @@ function registerRoutes(ctx: Context, imageCache: ImageDiskCache) {
     async handler(_req, res) {
       json(res, await imageCache.status());
     },
-  }), "dsh-openui: image cache status route");
+  }), "dsh-intelligent-ui: image cache status route");
 
   ctx.effect(() => ctx.webServer.register({
     kind: "exact",
@@ -278,7 +278,7 @@ function registerRoutes(ctx: Context, imageCache: ImageDiskCache) {
       await imageCache.clear();
       json(res, await imageCache.status());
     },
-  }), "dsh-openui: image cache clear route");
+  }), "dsh-intelligent-ui: image cache clear route");
 
   ctx.effect(() => ctx.webServer.register({
     kind: "exact",
@@ -287,14 +287,14 @@ function registerRoutes(ctx: Context, imageCache: ImageDiskCache) {
       const coords = new URL(req.url!, "http://localhost").searchParams.get("coords")!;
       json(res, { points: await streetRoute(coords) });
     },
-  }), "dsh-openui: street route");
+  }), "dsh-intelligent-ui: street route");
 }
 
 export function apply(ctx: Context) {
   const imageCache = new ImageDiskCache(imageCacheRoot());
-  void imageCache.init().catch((error) => ctx.logger.warn(`dsh-openui: image cache initialization failed: ${String(error)}`));
+  void imageCache.init().catch((error) => ctx.logger.warn(`dsh-intelligent-ui: image cache initialization failed: ${String(error)}`));
   registerRoutes(ctx, imageCache);
-  ctx.effect(() => ctx.on("api-session/removed", (sessionId) => imageCache.releaseSession(sessionId)), "dsh-openui: release deleted session images");
+  ctx.effect(() => ctx.on("api-session/removed", (sessionId) => imageCache.releaseSession(sessionId)), "dsh-intelligent-ui: release deleted session images");
   ctx.systemPrompt.section({
     name: "tool:render-openui",
     order: 6500,

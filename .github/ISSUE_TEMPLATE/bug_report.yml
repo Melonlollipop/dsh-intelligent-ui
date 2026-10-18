@@ -9,7 +9,7 @@ body:
   - type: input
     id: plugin-version
     attributes:
-      label: dsh-openui 版本
+      label: dsh-intelligent-ui 版本
       placeholder: v0.1.0
     validations:
       required: true

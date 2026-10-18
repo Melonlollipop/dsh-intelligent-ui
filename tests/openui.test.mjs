@@ -18,7 +18,7 @@ test("the generated library parses an interactive program", async () => {
   const parser = createParser(spec.schema, spec.root);
   const result = parser.parse(`root = Card([title, counter])
 $count = 1
-title = Title("DSH OpenUI", "lg")
+title = Title("DSH Intelligent UI", "lg")
 counter = Row([IconButton("minus", @Set($count, $count - 1), "减少"), Text($count + "", "lg"), IconButton("plus", @Set($count, $count + 1), "增加")], 3)`);
   assert.deepEqual(result.meta.errors, []);
   assert.equal(result.root.type, "element");

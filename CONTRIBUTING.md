@@ -1,6 +1,6 @@
 # Contributing
 
-感谢你帮助改进 `dsh-openui`。
+感谢你帮助改进 `dsh-intelligent-ui`。
 
 ## 开始之前
 

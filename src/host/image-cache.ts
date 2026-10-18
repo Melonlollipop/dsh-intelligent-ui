@@ -319,7 +319,7 @@ export class ImageDiskCache {
       if (RETRY_DELAYS_MS[attempt] > 0) await this.sleep(RETRY_DELAYS_MS[attempt]);
       try {
         const response = await this.fetchImpl(url, {
-          headers: { "User-Agent": "dsh-openui/0.1" },
+          headers: { "User-Agent": "dsh-intelligent-ui/0.1" },
           signal: AbortSignal.timeout(10_000),
         });
         if (response.status === 404 || response.status === 410) throw Object.assign(new Error(`image ${response.status}`), { permanent: true });

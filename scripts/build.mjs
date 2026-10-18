@@ -6,18 +6,18 @@ const root = resolve(import.meta.dirname, "..");
 const outdir = resolve(root, "lib");
 
 const cssPlugin = {
-  name: "dsh-openui-css",
+  name: "dsh-intelligent-ui-css",
   setup(buildContext) {
     buildContext.onLoad({ filter: /\.css$/ }, async ({ path }) => {
       const css = await readFile(path, "utf8");
-      const id = `dsh-openui/${basename(path)}`;
+      const id = `dsh-intelligent-ui/${basename(path)}`;
       return {
         loader: "js",
         contents: `
 const id = ${JSON.stringify(id)};
 if (document.querySelector('style[data-plugin-css=' + JSON.stringify(id) + ']') === null) {
   const style = document.createElement('style');
-  style.dataset.plugin = 'dsh-openui';
+  style.dataset.plugin = 'dsh-intelligent-ui';
   style.dataset.pluginCss = id;
   style.textContent = ${JSON.stringify(css)};
   document.head.appendChild(style);
@@ -61,7 +61,7 @@ await build({
     "process.env.NODE_ENV": JSON.stringify("production"),
   },
   banner: {
-    js: `window.__ModuleLoader__.load({ id: "dsh-openui", factory: (require) => { var module = { exports: {} }; var exports = module.exports;`,
+    js: `window.__ModuleLoader__.load({ id: "dsh-intelligent-ui", factory: (require) => { var module = { exports: {} }; var exports = module.exports;`,
   },
   footer: {
     js: `return module.exports; } });`,

@@ -13,7 +13,7 @@ const imageResponse = (body = "image") => new Response(Buffer.from(body), {
 const idFromUrl = (url: string) => url.split("/").at(-1)!;
 
 test("retries transient downloads and restores images from disk", async () => {
-  const root = await mkdtemp(join(tmpdir(), "dsh-openui-cache-"));
+  const root = await mkdtemp(join(tmpdir(), "dsh-intelligent-ui-cache-"));
   let requests = 0;
   const delays: number[] = [];
   const fetchMock: typeof fetch = async () => {
@@ -40,7 +40,7 @@ test("retries transient downloads and restores images from disk", async () => {
 });
 
 test("deletes an image only after its last session reference is removed", async () => {
-  const root = await mkdtemp(join(tmpdir(), "dsh-openui-cache-"));
+  const root = await mkdtemp(join(tmpdir(), "dsh-intelligent-ui-cache-"));
   let requests = 0;
   try {
     const cache = new ImageDiskCache(root, { fetch: async () => { requests += 1; return imageResponse(); } });
@@ -62,7 +62,7 @@ test("deletes an image only after its last session reference is removed", async 
 });
 
 test("repairs invalid legacy owner identifiers and never retains them again", async () => {
-  const root = await mkdtemp(join(tmpdir(), "dsh-openui-cache-"));
+  const root = await mkdtemp(join(tmpdir(), "dsh-intelligent-ui-cache-"));
   try {
     const cache = new ImageDiskCache(root, { fetch: async () => imageResponse() });
     const id = idFromUrl(await cache.registerSource("https://images.example/legacy.jpg"));
@@ -82,7 +82,7 @@ test("repairs invalid legacy owner identifiers and never retains them again", as
 });
 
 test("evicts old files over the size limit and repairs orphan files at startup", async () => {
-  const root = await mkdtemp(join(tmpdir(), "dsh-openui-cache-"));
+  const root = await mkdtemp(join(tmpdir(), "dsh-intelligent-ui-cache-"));
   let requests = 0;
   try {
     await mkdir(join(root, "images"), { recursive: true });

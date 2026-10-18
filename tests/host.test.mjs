@@ -5,9 +5,9 @@ import { join } from "node:path";
 import test from "node:test";
 
 test("render_openui concludes the turn after returning the interface", async () => {
-  const cacheRoot = await mkdtemp(join(tmpdir(), "dsh-openui-host-test-"));
-  const previousCacheRoot = process.env.DSH_OPENUI_CACHE_DIR;
-  process.env.DSH_OPENUI_CACHE_DIR = cacheRoot;
+  const cacheRoot = await mkdtemp(join(tmpdir(), "dsh-intelligent-ui-host-test-"));
+  const previousCacheRoot = process.env.DSH_INTELLIGENT_UI_CACHE_DIR;
+  process.env.DSH_INTELLIGENT_UI_CACHE_DIR = cacheRoot;
   const { apply } = await import(`../lib/index.js?test=${Date.now()}`);
   let tool;
   let section;
@@ -38,7 +38,7 @@ test("render_openui concludes the turn after returning the interface", async () 
     },
     clientModules: {
       graph() {
-        return { entries: [{ id: "dsh-openui", rev: "test" }] };
+        return { entries: [{ id: "dsh-intelligent-ui", rev: "test" }] };
       },
       clientPath() {
         return "client.js";
@@ -87,8 +87,8 @@ test("render_openui concludes the turn after returning the interface", async () 
     assert.equal(JSON.parse(statusBody).files, 0);
   } finally {
     disposers.reverse().forEach((dispose) => dispose());
-    if (previousCacheRoot === undefined) delete process.env.DSH_OPENUI_CACHE_DIR;
-    else process.env.DSH_OPENUI_CACHE_DIR = previousCacheRoot;
+    if (previousCacheRoot === undefined) delete process.env.DSH_INTELLIGENT_UI_CACHE_DIR;
+    else process.env.DSH_INTELLIGENT_UI_CACHE_DIR = previousCacheRoot;
     await rm(cacheRoot, { recursive: true, force: true });
   }
 });
