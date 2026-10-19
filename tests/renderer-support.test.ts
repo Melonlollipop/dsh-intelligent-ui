@@ -63,7 +63,9 @@ test("the DSH renderer wires persistence and upstream action handling", async ()
   assert.match(source, /runLibraryAction\(event\)/);
   assert.match(source, /webUrl\(event\.params\.url\)/);
   assert.match(source, /ImageOwnerProvider sessionId=\{props\.sessionId\} callId=\{props\.callId\}/);
-  assert.match(source, /inject: \(sessionId\) => \(\{ sessionId \}\)/);
+  assert.match(source, /props\.block\.args\.text\("program"\)/);
+  assert.doesNotMatch(source, /useToolCallArgumentsPartial/);
+  assert.match(source, /key: "render_openui"/);
   assert.match(media, /IMAGE_RETRY_DELAYS/);
   assert.match(media, /window\.addEventListener\("online", retry\)/);
   assert.match(media, /sessionId/);

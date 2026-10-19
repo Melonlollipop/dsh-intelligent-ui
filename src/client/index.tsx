@@ -3,52 +3,29 @@ import "./client.css";
 
 import type { OpenUIError } from "@openuidev/lang-core";
 import { BuiltinActionType, Renderer, type ActionEvent } from "@openuidev/react-lang";
-import { useCallback, useLayoutEffect, useRef, useState, type ComponentType } from "react";
+import type { Context } from "@deepseek-ai/cordis";
+import type { InputActions } from "@deepseek-ai/dsh-client-ui-conversation/client";
+import type {} from "@deepseek-ai/dsh-client-ui-renderer/client";
+import type {} from "@deepseek-ai/dsh-client-ui-session/client";
+import type { ToolCallViewProps } from "@deepseek-ai/dsh-client-ui-tool/client";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { runLibraryAction } from "../openui/actions";
 import { ImageOwnerProvider } from "../openui/components/media";
 import { webUrl } from "../openui/components/style";
 import { library } from "../openui/library";
 import { loadRendererState, rendererErrorMessages, saveRendererState } from "./renderer-support";
-import { readStreamingString } from "./streaming-json";
-
-type InputActions = {
-  setDraft(text: string): void;
-  submit(): void;
-};
-
-type StartedBlock = { argsRaw: string };
-type ResultBlock = { call: { argsRaw: string } };
-
-type OpenUIToolViewProps = {
-  callId: string;
-  phase: "preparing" | "start" | "result";
-  block: StartedBlock | ResultBlock;
-  useToolCallArgumentsPartial(): string;
-  inputActions: InputActions;
-  sessionId: string;
-};
 
 type RenderArgs = {
   program: string;
   title?: string;
 };
 
-function rawArguments(props: OpenUIToolViewProps, partial: string): string {
-  if (props.phase === "preparing") return partial;
-  if (props.phase === "start") return (props.block as StartedBlock).argsRaw;
-  return (props.block as ResultBlock).call.argsRaw;
-}
-
-function streamedArgs(raw: string): RenderArgs {
+function renderArgs(props: ToolCallViewProps): RenderArgs {
   return {
-    program: readStreamingString(raw, "program"),
-    title: readStreamingString(raw, "title"),
+    program: props.block.args.text("program") ?? "",
+    title: props.block.args.text("title"),
   };
-}
-
-function finishedArgs(raw: string): RenderArgs {
-  return JSON.parse(raw) as RenderArgs;
 }
 
 function assistantMessage(event: ActionEvent): string {
@@ -141,13 +118,11 @@ function mountPoint(marker: HTMLElement, callId: string) {
   return root;
 }
 
-function OpenUIToolView(props: OpenUIToolViewProps) {
+function OpenUIToolView(props: ToolCallViewProps) {
   const marker = useRef<HTMLSpanElement>(null);
   const [portalRoot, setPortalRoot] = useState<HTMLElement>();
-  const partial = props.useToolCallArgumentsPartial();
-  const raw = rawArguments(props, partial);
   const streaming = props.phase === "preparing";
-  const args = streaming ? streamedArgs(raw) : finishedArgs(raw);
+  const args = renderArgs(props);
 
   useLayoutEffect(() => {
     const root = mountPoint(marker.current!, props.callId);
@@ -172,19 +147,9 @@ function OpenUIToolView(props: OpenUIToolViewProps) {
 
 export const inject = ["slots"];
 
-export function apply(ctx: {
-  slots: {
-    inject(name: string, callback: () => () => void): () => void;
-    register(options: {
-      name: string;
-      key?: string;
-      inject?: (sessionId: string) => { sessionId: string };
-    }, component: ComponentType<any>): () => void;
-  };
-}) {
+export function apply(ctx: Context) {
   ctx.slots.inject("tool.call.toolview", () => ctx.slots.register({
     name: "tool.call.toolview",
     key: "render_openui",
-    inject: (sessionId) => ({ sessionId }),
   }, OpenUIToolView));
 }

@@ -2,7 +2,7 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/)。
 
-## Unreleased
+## 0.1.1 - 2026-10-18
 
 ### Added
 
@@ -15,6 +15,7 @@
 
 ### Changed
 
+- 适配 DeepSeek Harness `0.2.1-rc.2` 的惰性工具参数视图，恢复历史与新生成 OpenUI 卡片的渲染。
 - 复制操作改为复用上游的 Clipboard API 降级逻辑。
 - 打开链接前使用上游 `webUrl()` 限制为绝对 HTTP(S) 地址。
 

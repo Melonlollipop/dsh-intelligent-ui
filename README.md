@@ -32,7 +32,7 @@ OpenUI 只在模型判断交互界面确实有帮助时使用。工具调用记�
 
 ## 环境要求
 
-- DeepSeek Harness，使用兼容 `0.2.0-rc.2` 客户端插件接口的版本。
+- DeepSeek Harness `0.2.1-rc.2` 或兼容版本。
 - Node.js 24 或更高版本（仅开发和独立构建时需要）。
 - 安装后需要完整重启对应的 DSH Profile。
 
@@ -48,7 +48,7 @@ OpenUI 只在模型判断交互界面确实有帮助时使用。工具调用记�
 4. 执行：
 
 ```powershell
-dsh plugin --profile desktop add "github:Melonlollipop/dsh-intelligent-ui#v0.1.0"
+dsh plugin --profile desktop add "github:collabgod/dsh-intelligent-ui#v0.1.1"
 ```
 
 5. 重新启动 DSH 桌面版。
@@ -56,7 +56,7 @@ dsh plugin --profile desktop add "github:Melonlollipop/dsh-intelligent-ui#v0.1.0
 ### 独立 Web 版
 
 ```powershell
-npx -y @deepseek-ai/dsh plugin --profile web add "github:Melonlollipop/dsh-intelligent-ui#v0.1.0"
+npx -y @deepseek-ai/dsh plugin --profile web add "github:collabgod/dsh-intelligent-ui#v0.1.1"
 ```
 
 安装后重启 `dsh web`。
@@ -66,7 +66,7 @@ npx -y @deepseek-ai/dsh plugin --profile web add "github:Melonlollipop/dsh-intel
 发布新标签后，使用对应的新标签重新安装。例如：
 
 ```powershell
-dsh plugin --profile desktop add "github:Melonlollipop/dsh-intelligent-ui#v0.2.0"
+dsh plugin --profile desktop add "github:collabgod/dsh-intelligent-ui#v0.2.0"
 ```
 
 ### 卸载
@@ -91,7 +91,7 @@ dsh plugin --profile desktop remove dsh-intelligent-ui
 ## 本地开发
 
 ```powershell
-git clone https://github.com/Melonlollipop/dsh-intelligent-ui.git
+git clone https://github.com/collabgod/dsh-intelligent-ui.git
 Set-Location dsh-intelligent-ui
 npm ci
 npm run typecheck
@@ -163,7 +163,7 @@ npm pack --dry-run
 
 ## 已知限制
 
-- 当前依赖 DSH `0.2.0-rc.2` 系列的客户端插槽和 DOM 标记；DSH 大版本更新后可能需要适配。
+- 当前依赖 DSH `0.2.1-rc.2` 系列的客户端工具参数视图、插槽和 DOM 标记；DSH 大版本更新后可能需要适配。
 - 交互式地图使用 MapLibre GL、OpenFreeMap/OpenStreetMap 底图；路线叠加由 OSRM 公共演示服务提供，属于道路概览，不是步行或公交导航。
 - OpenUI 是否出现由模型和任务共同决定，不能保证每个模型都在相同问题上作出完全一致的选择。
 
