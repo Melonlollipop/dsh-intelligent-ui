@@ -48,7 +48,7 @@ OpenUI 只在模型判断交互界面确实有帮助时使用。工具调用记�
 4. 执行：
 
 ```powershell
-dsh plugin --profile desktop add "github:collabgod/dsh-intelligent-ui#v0.1.1"
+dsh plugin --profile desktop add "github:Melonlollipop/dsh-intelligent-ui#v0.1.1"
 ```
 
 5. 重新启动 DSH 桌面版。
@@ -56,7 +56,7 @@ dsh plugin --profile desktop add "github:collabgod/dsh-intelligent-ui#v0.1.1"
 ### 独立 Web 版
 
 ```powershell
-npx -y @deepseek-ai/dsh plugin --profile web add "github:collabgod/dsh-intelligent-ui#v0.1.1"
+npx -y @deepseek-ai/dsh plugin --profile web add "github:Melonlollipop/dsh-intelligent-ui#v0.1.1"
 ```
 
 安装后重启 `dsh web`。
@@ -66,7 +66,7 @@ npx -y @deepseek-ai/dsh plugin --profile web add "github:collabgod/dsh-intellige
 发布新标签后，使用对应的新标签重新安装。例如：
 
 ```powershell
-dsh plugin --profile desktop add "github:collabgod/dsh-intelligent-ui#v0.2.0"
+dsh plugin --profile desktop add "github:Melonlollipop/dsh-intelligent-ui#v0.2.0"
 ```
 
 ### 卸载
@@ -91,7 +91,7 @@ dsh plugin --profile desktop remove dsh-intelligent-ui
 ## 本地开发
 
 ```powershell
-git clone https://github.com/collabgod/dsh-intelligent-ui.git
+git clone https://github.com/Melonlollipop/dsh-intelligent-ui.git
 Set-Location dsh-intelligent-ui
 npm ci
 npm run typecheck

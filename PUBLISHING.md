@@ -10,11 +10,11 @@
 {
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/collabgod/dsh-intelligent-ui.git"
+    "url": "git+https://github.com/Melonlollipop/dsh-intelligent-ui.git"
   },
-  "homepage": "https://github.com/collabgod/dsh-intelligent-ui#readme",
+  "homepage": "https://github.com/Melonlollipop/dsh-intelligent-ui#readme",
   "bugs": {
-    "url": "https://github.com/collabgod/dsh-intelligent-ui/issues"
+    "url": "https://github.com/Melonlollipop/dsh-intelligent-ui/issues"
   }
 }
 ```
@@ -47,7 +47,7 @@ git init -b main
 git add .
 git status
 git commit -m "Initial release"
-git remote add origin https://github.com/collabgod/dsh-intelligent-ui.git
+git remote add origin https://github.com/Melonlollipop/dsh-intelligent-ui.git
 git push -u origin main
 ```
 
