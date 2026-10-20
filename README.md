@@ -153,25 +153,12 @@ npm run build
 npm pack --dry-run
 ```
 
-## 安全说明
-
-- `HtmlView` 在不具备同源权限的沙箱 iframe 中运行，禁止表单提交和宿主页面导航，并受 CSP 限制。
-- `@OpenUrl` 只允许绝对 `http`/`https` 地址；复制操作在 Clipboard API 不可用时会回退到本地文本区复制。
-- 生成的界面可以展示远程图片、打开外部链接，以及把用户确认的交互上下文提交回当前对话；远程图片由 Host 端下载后通过本地缓存路由提供给界面。
-- 安装第三方 DSH 插件前应审查其源码和依赖；本项目不会修改 DSH 核心程序文件。
-- 安全问题请按照 [SECURITY.md](SECURITY.md) 私下报告，不要先创建公开 Issue。
-
 ## 已知限制
 
 - 当前依赖 DSH `0.2.1-rc.2` 系列的客户端工具参数视图、插槽和 DOM 标记；DSH 大版本更新后可能需要适配。
 - 交互式地图使用 MapLibre GL、OpenFreeMap/OpenStreetMap 底图；路线叠加由 OSRM 公共演示服务提供，属于道路概览，不是步行或公交导航。
 - OpenUI 是否出现由模型和任务共同决定，不能保证每个模型都在相同问题上作出完全一致的选择。
 
-## 上游与授权
-
-组件、样式、函数与提示词基于 [`thesysdev/open-intelligent-ui`](https://github.com/thesysdev/open-intelligent-ui) 的提交 `6a4a0ba192ea285b3a5ed39dcc1295d7d4080d6f` 修改。上游作者已书面同意这些衍生内容在本仓库中公开发布。
-
-DSH 集成层和上游衍生内容适用不同条款。完整范围见 [LICENSE](LICENSE) 与 [NOTICE.md](NOTICE.md)。本项目与 DeepSeek、thesysdev 均无官方隶属或背书关系。
 
 ## 贡献
 
